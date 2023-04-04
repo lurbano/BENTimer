@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #questionNumber {
+            width: 3em;
+        }
+        #dataTable {
+            width: 10em;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+    </style>
+    <title>Timer</title>
+</head>
+<body>
+    <div id="input">
+        <input type="number" id="questionNumber"  value="1">
+        <input type="button" value="Start" id="timerButton">
+    </div>
+    <div id="output">
+        <div id="timerClock"></div>
+        <div id="dataTable" ></div>
+        <canvas id="tGraph"></canvas>
+    </div>
+    
+</body>
+<script>
+    var doc = document;
+    var t_log = [];
+    var q_log = [];
+    var l_run = false;
+    var startTime = 0;
+    var countTime = 0;
+    var timerID = 0;
+
+    // assume questions start at 1 and are odd numbers.
+    var qNum = 1;
+
+
+    
+    timerButton.addEventListener('click', logTime);
+
+    function logTime(){
+        if (l_run) {
+            let q = parseInt(questionNumber.value);
+            let d = new Date();
+            countTime = d.getTime()
+            let dt = countTime - startTime;
+            t_log.push(dt/1000);
+            q_log.push(q);
+
+            //update q
+            questionNumber.value = q + 2;
+            
+            console.log(t_log, q_log);
+            makeTable();
+        } else { //initialize
+            l_run = true;
+            let  d = new Date();
+            startTime = d.getTime();
+            countTime = d.getTime();
+            console.log("Starting timer");
+            //tlog.push(new qtime(0, 0));
+            timerID = setInterval(timer, 1000);
+
+            timerButton.value = "Next"
+
+            makeTable();
+        }
+        
+    }
+
+    function timer(){
+        let d = new Date();
+        let dt = d.getTime() - startTime;
+        let t = new Date(dt);
+        let m = t.getUTCMinutes();
+        let s = t.getUTCSeconds();
+        timerClock.innerHTML = `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+    }
+
+    function makeTable(){
+        dataTable.innerHTML = "";
+        let div = doc.createElement('span');
+        div.innerHTML = "Ques. #";
+        dataTable.appendChild(div);
+        div = doc.createElement('span');
+        div.innerHTML = "Time (sec)";
+        dataTable.appendChild(div);
+
+        for (let i=0; i<t_log.length; i++){
+            div = doc.createElement("span");
+            div.innerHTML = q_log[i];
+            dataTable.appendChild(div);
+
+            div = doc.createElement("span");
+            div.innerHTML = t_log[i];
+            dataTable.appendChild(div);
+        }
+    }
+</script>
+</html>
