@@ -17,6 +17,14 @@
         #chartDiv {
             width: 75%;
         }
+        #timerButton {
+            width: 5em;
+            height: 5em;
+            font-size: xx-large;
+        }
+        #questionNumber {
+            font-size: large;
+        }
     </style>
     <title>Timer</title>
 </head>
@@ -27,10 +35,11 @@
     </div>
     <div id="output">
         <div id="timerClock"></div>
-        <div id="dataTable" ></div>
         <div id="chartDiv">
             <canvas id="tGraph"></canvas>
         </div>
+        <div id="dataTable" ></div>
+        
     </div>
     
 </body>
@@ -64,7 +73,7 @@
             
             console.log(t_log, q_log);
             makeTable();
-            updateGraph(plotType="trajectory");
+            updateGraph();
         } else { //initialize
             l_run = true;
             let  d = new Date();
@@ -114,7 +123,7 @@
     const ctx = doc.getElementById('tGraph');
 
     var chart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: q_log,
             datasets: [
@@ -150,7 +159,7 @@
         // }
     });
 
-    function updateGraph(plotType="qps", chartType="line"){
+    function updateGraph(plotType="tpq", chartType="line"){
 
         chart.data.labels = q_log;
         chart.type = chartType;
@@ -159,9 +168,15 @@
         if (plotType === 'qps') {
             t_data.push(1/t_log[0]);
             for (let i=1; i<t_log.length; i++){
-                t_data.push(1/(t_log[i]-t_log[i-1]))
+                t_data.push(1/(t_log[i]-t_log[i-1]));
             }
-        } else {
+        } else if (plotType = 'tpq') {
+            t_data.push(1/t_log[0]);
+            for (let i=1; i<t_log.length; i++){
+                t_data.push((t_log[i]-t_log[i-1]));
+            }
+        }
+        else {
             t_data = t_log;
         }
         chart.data.datasets[0].data = t_data;
