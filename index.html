@@ -14,6 +14,9 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
         }
+        #chartDiv {
+            width: 75%;
+        }
     </style>
     <title>Timer</title>
 </head>
@@ -25,7 +28,9 @@
     <div id="output">
         <div id="timerClock"></div>
         <div id="dataTable" ></div>
-        <canvas id="tGraph"></canvas>
+        <div id="chartDiv">
+            <canvas id="tGraph"></canvas>
+        </div>
     </div>
     
 </body>
@@ -59,6 +64,7 @@
             
             console.log(t_log, q_log);
             makeTable();
+            updateGraph(plotType="trajectory");
         } else { //initialize
             l_run = true;
             let  d = new Date();
@@ -68,7 +74,7 @@
             //tlog.push(new qtime(0, 0));
             timerID = setInterval(timer, 1000);
 
-            timerButton.value = "Next"
+            timerButton.value = "Log"
 
             makeTable();
         }
@@ -102,6 +108,64 @@
             div.innerHTML = t_log[i];
             dataTable.appendChild(div);
         }
+    }
+
+
+    const ctx = doc.getElementById('tGraph');
+
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: q_log,
+            datasets: [
+                {
+                    label: "Time Trajectory",
+                    data: [],
+                    borderColor: '#006eb8',
+                    backgroundColor: '#9BD0F5',
+                    showLine: true,
+                }
+            ]
+        },
+        options: {
+            responsive: true
+        }
+        // options: {
+        //     scales: {
+        //         x: {
+        //             type: 'linear',
+        //             position: 'bottom',
+        //             text: "time (sec)",
+        //             display: true
+        //             // min: 0,
+        //             // max: 100
+        //         },
+        //         y: {
+        //             type: 'linear',
+        //             position: 'left',
+        //             // min: 10,
+        //             // max: 70
+        //         }
+        //     }
+        // }
+    });
+
+    function updateGraph(plotType="qps", chartType="line"){
+
+        chart.data.labels = q_log;
+        chart.type = chartType;
+        t_data = [];
+            
+        if (plotType === 'qps') {
+            t_data.push(1/t_log[0]);
+            for (let i=1; i<t_log.length; i++){
+                t_data.push(1/(t_log[i]-t_log[i-1]))
+            }
+        } else {
+            t_data = t_log;
+        }
+        chart.data.datasets[0].data = t_data;
+        chart.update();
     }
 </script>
 </html>
